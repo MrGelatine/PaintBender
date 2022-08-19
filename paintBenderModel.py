@@ -1,12 +1,14 @@
 from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
+from torchvision import transforms
+import torch.nn as nn
+from matplotlib import cm
 
-from torchvision import transforms, models
 
 import time
-import torch.nn as nn
+
+import torch
 
 class PaintBender(nn.Module):
     def __init__(self, core, target_path, style_path, device, time_limit, content_weight=1, style_weight=1000,
@@ -31,6 +33,7 @@ class PaintBender(nn.Module):
         self.counter = 0
         self.device = device
         self.time_limit = time_limit
+        self.snap_every = 500
         self.prev_style_loss = float("inf")
 
     def forward(self, target):
@@ -53,7 +56,10 @@ class PaintBender(nn.Module):
         total_loss = self.content_total_weight * content_loss + self.style_total_weight * style_loss
         curr_time = (time.time() - self.start_time) / 60.0
         #Save snapshot
+
         if (self.counter % self.snap_every == 0 or curr_time > self.time_limit):
+            Image.fromarray(np.uint8(PaintBender.im_convert(target) * 255.0)).save(
+                f"./snapshoots/{int(self.counter / self.snap_every)}.jpg")
             print('Total loss: ', total_loss.item())
             print("Content Loss: ", content_loss.item())
             print("Style Loss: ", style_loss.item())
