@@ -1,9 +1,8 @@
 from PIL import Image
-import matplotlib.pyplot as plt
 import numpy as np
 from torchvision import transforms
 import torch.nn as nn
-from matplotlib import cm
+
 
 
 import time
@@ -11,7 +10,7 @@ import time
 import torch
 
 class PaintBender(nn.Module):
-    def __init__(self, core, target_path, style_path, device, time_limit, content_weight=1, style_weight=1000,
+    def __init__(self, core, target_path, style_path, device, time_limit, deep_style=True,content_weight=1, style_weight=1000,
                  snap_every=500):
         super().__init__()
 
@@ -21,11 +20,18 @@ class PaintBender(nn.Module):
         self.core = core
         for param in self.core.parameters():
             param.requires_grad_(False)
-        self.style_weights = {'conv1_1': 1.0,
-                              'conv2_1': 1.0,
-                              'conv3_1': 1.0,
-                              'conv4_1': 1.0,
-                              'conv5_1': 1.0}
+        if(deep_style):
+            self.style_weights = {'conv1_1': 1.0,
+                                'conv2_1': 1.0,
+                                'conv3_1': 1.0,
+                                'conv4_1': 1.0,
+                                'conv5_1': 1.0}
+        else:
+            self.style_weights = {'conv1_1': 1.0,
+                                  'conv2_1': 0.2,
+                                  'conv3_1': 0.2,
+                                  'conv4_1': 0.2,
+                                  'conv5_1': 0.2}
 
         self.content_total_weight = content_weight
         self.style_total_weight = style_weight
@@ -72,6 +78,8 @@ class PaintBender(nn.Module):
                 print("=============================")
                 print("Time to Break!")
                 print("=============================")
+                Image.fromarray(np.uint8(PaintBender.im_convert(target) * 255.0)).save(
+                    f"./results/{self.target_path.split('//')[-1].split('.')[0]}_new.jpg")
                 return False
             self.prev_style_loss = style_loss.item()
         self.counter += 1
