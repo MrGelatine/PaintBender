@@ -14,7 +14,7 @@ python main.py eval --target dark_castle.jpg --style Starry_Night.jpg --time 5 -
 * `--deep_style`: If false, only change color pallet.
 4. The finale version of picture will be located at results folder, but you also can see target snapshoots, that was had benn maiden during the transformation process
 # Examples
-Here is some examples of PaintBender work at deep style mod
+Here is some examples of PaintBender work at deep style mode
 <img src="https://github.com/MrGelatine/PaintBender/blob/main/results/chicago_new.png" />
 <img src="https://github.com/MrGelatine/PaintBender/blob/main/results/dark_castle_new.png" />
 <img src="https://github.com/MrGelatine/PaintBender/blob/main/results/human_son_new.png" />
